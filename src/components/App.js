@@ -42,10 +42,27 @@ class App extends React.Component {
           this.state.node.files.add(buffer, (err, files) => {
             let web = ['https://ipfs.io/ipfs/' + files[0].hash];
             this.setState({web});
-            fetch('http://enigmatic-reaches-70184.herokuapp.com/search/test')
-            .then(function(response) {
-              console.log(response)
+            fetch('http://enigmatic-reaches-70184.herokuapp.com/search/ello', {
+              headers: {
+                "accept": "application/json"
+              },
+              method: "GET",
+              mode:"no-cors",
+
             })
+
+            .then((response) => {
+              debugger
+              return  response.text()
+            })
+            .then((response) => {
+              debugger
+              return
+            })
+
+            .catch((error) => {
+              console.error(error);
+            });
           })
         })
       })
@@ -83,6 +100,9 @@ class App extends React.Component {
       <br />
       <a href={this.state.web[0]}>{this.state.web.map((el) => el)}</a>
       </section>
+      <br />
+      <br />
+      <p> Created by Eric Alcaide, Pol Baladas & Alex Sicart</p>
       </div>
     );
   }
