@@ -1,37 +1,31 @@
 import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
 import Buffer from 'buffer';
-
-import logo from './logo.svg';
-import './App.css';
-
-
-import React from 'react';
-import Dropzone from 'react-dropzone';
-
-import Buffer from 'buffer';
 import webtorrent from 'webtorrent';
 
 import Ipfs from 'ipfs';
+
+import logo from './logo.svg';
+import './App.css';
 
 class App extends React.Component {
   constructor() {
     super()
     this.state = {
       files: [],
+      web: ['https://ipfs.io/ipfs/QmRUWea8MqLrfC1x6Rfi6xbK1PccCRCVLVo9weNzZxtoFz/'],
       node:  new Ipfs({
         repo: String(Math.random() + Date.now())
       }),
       client: new webtorrent(),
-
     }
   }
 
   componentDidMount () {
-        this.state.node.on('ready', () => {
-          console.log('IPFS node is ready')
-        })
-      }
+    this.state.node.on('ready', () => {
+      console.log('IPFS node is ready')
+    })
+  }
 
   onDrop(files) {
     this.setState({
@@ -40,28 +34,43 @@ class App extends React.Component {
   }
 
   handleClick = () => {
-    console.log(this.state.files[0]);
-    this.state.client.seed(this.state.files[0], (torrent) => {
-      console.log('torrent', torrent);
-      torrent.files[0].getBuffer((err, buffer) => {
-        this.state.node.files.add(buffer, function(err, files) {
-          alert('https://ipfs.io/ipfs/' + files[0].hash);
-          console.log('https://ipfs.io/ipfs/' + files[0].hash);
+    for (let i = 0; i < this.state.files.length; i ++) {
+      console.log(this.state.files[i]);
+      this.state.client.seed(this.state.files[i], (torrent) => {
+        console.log('torrent', torrent);
+        torrent.files[0].getBuffer((err, buffer) => {
+          this.state.node.files.add(buffer, (err, files) => {
+            let web = ['https://ipfs.io/ipfs/' + files[0].hash];
+            this.setState({web});
+            fetch('http://enigmatic-reaches-70184.herokuapp.com/search/test')
+            .then(function(response) {
+              console.log(response)
+            })
+          })
+        })
       })
-    })
-    })
+    }
   }
 
   render() {
     return (
+      <div className="container">
       <section>
-      <h2>Decentralized Cloud 2.0</h2>
+      <h1> Decentralized Webpages </h1>
+      <form>
+      <label for="exampleMessage">Search</label>
+      <input class="u-full-width" type="email" placeholder="Search" id="exampleEmailInput" />
+      <input class="button-primary" type="submit" value="Search" />
+      </form>
+
       <div className="dropzone">
       <Dropzone onDrop={this.onDrop.bind(this)}>
+      <p>Try dropping your index.html file here.</p>
       </Dropzone>
       </div>
       <aside>
-      <h2>Dropped files</h2>
+      <br /><br/>
+      <h4>Dropped HTML file</h4>
       <ul>
       {
         this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
@@ -69,9 +78,12 @@ class App extends React.Component {
       </ul>
       </aside>
       <button onClick={this.handleClick}>
-      Upload Files!!
+      Upload webpage!!
       </button>
+      <br />
+      <a href={this.state.web[0]}>{this.state.web.map((el) => el)}</a>
       </section>
+      </div>
     );
   }
 }
