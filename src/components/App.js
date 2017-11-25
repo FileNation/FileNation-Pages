@@ -13,7 +13,7 @@ class App extends React.Component {
     super()
     this.state = {
       files: [],
-      web: ['https://ipfs.io/ipfs/QmRUWea8MqLrfC1x6Rfi6xbK1PccCRCVLVo9weNzZxtoFz/'],
+      web: [],
       node:  new Ipfs({
         repo: String(Math.random() + Date.now())
       }),
